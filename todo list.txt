@@ -1,0 +1,7 @@
+dimenções:
+Tempo (feito, falta mini-dimenção, falta carregar apenas os novos)
+Canais(feito, falta carregar os ainda não inseridos)
+Promoções
+Produtos
+Employees
+Suppliers

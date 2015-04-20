@@ -1,0 +1,23 @@
+Vasco(BDII_1010834):
+(data warehouse)
+	DIM_CANAIS
+	DIM_CLIENTES
+	DIM_EMPLOYEES
+	DIM_PROMOCOES
+	DIM_SUPPLIERS
+	DIM_TEMPO
+	FAC_COMPRAS
+	FAC_PROMOCOES
+	FAC_VENDAS
+
+Sandro(BDII_1010985):
+(extenção à base de dados operacional)
+	PROMOTION_TYPES
+	PROMOTIONS
+	PROMOTIONS_PRODUCTS
+
+
+Joao(BDII_1010832):
+(dados carregados dos ficheiros)
+	Channels
+	Emplyees
