@@ -1,0 +1,272 @@
+drop table fac_Promocoes;
+drop table fac_compras;
+drop table fac_vendas;
+drop table Dim_Tempo;
+
+create table Dim_Tempo(
+  Surr_Tempo number NOT NULL,
+  Dia number(2,0) NOT NULL,
+  Mes number(2,0) NOT NULL,
+  Ano number(4,0) NOT NULL,
+  Dia_Semana varchar2(255) NOT NULL,
+  De_Manha number(1,0) NOT NULL
+  );
+
+drop table dim_Promocoes;
+create table Dim_Promocoes(
+  Surr_Promocao number NOT NULL,
+  Id_Promocao number NOT NULL,
+  Nome varchar2(255) NOT NULL,
+  Desconto number NOT NULL,
+  Tipo_Promocao varchar2(255) NOT NULL
+);
+
+drop table Dim_Canais;
+create table Dim_Canais (
+Surr_Canal number NOT NULL,
+Id_Canal number NOT NULL,
+Descricao varchar2(255) NOT NULL,
+Classe varchar2(255) NOT NULL,
+Custo_Venda number(4,3) NOT NULL
+);
+
+drop table Dim_Produtos;
+create table Dim_Produtos (
+Surr_Produto number NOT NULL,
+Id_Produto number NOT NULL,
+Categoria varchar2(255) NOT NULL,
+Sub_Categoria varchar2(255) NOT NULL,
+Classe_Peso number(2) NOT NULL,
+Unidade_Medida varchar2(255) NOT NULL,
+Tamanho_Pacote number(6,2) NOT NULL,
+Lista_Preco number(6,2) NOT NULL,
+Min_Preco number(7,2) NOT NULL,
+Descricao varchar2(255) NOT NULL
+);
+
+drop table Dim_clientes;
+create table Dim_Clientes(
+Surr_Cliente number NOT NULL,
+Id_Cliente number NOT NULL,
+Genero varchar2(255) NOT NULL,
+Data_Nascimento date NOT NULL,
+Estado_Civil varchar2(255) NOT NULL,
+Salario_Classe number NOT NULL,
+Limite_Credito number(20) NOT NULL,
+Custo_Total number NOT NULL,
+Cidade varchar2(255) NOT NULL,
+Provincia varchar2(255) NOT NULL,
+Pais varchar2(255) NOT NULL,
+Sub_Regiao varchar2(255) NOT NULL,
+Regiao varchar2(255) NOT NULL
+);
+
+
+
+create table Fac_Vendas (
+Surr_Tempo number NOT NULL,
+Surr_Canal number NOT NULL,
+Surr_Cliente number NOT NULL,
+Surr_Promocao number NOT NULL,
+Surr_Produto number NOT NULL,
+Unid_Vendidas number(4) NOT NULL,
+Custo_Compra number(6,2) NOT NULL,
+Valor_Venda number(7) NOT NULL
+);
+
+drop table dim_employees;
+create table Dim_Employees (
+Surr_Employee number NOT NULL,
+Id_Employee number NOT NULL,
+Comissao number NOT NULL,
+Primeiro_Nome varchar2(255) NOT NULL,
+Ultimo_Nome varchar2(255) NOT NULL,
+Trabalho varchar2(255) NOT NULL,
+Manager varchar2(255) NOT NULL,
+Salario_Classe varchar2(255) NOT NULL
+);
+
+drop table dim_suppliers;
+create table Dim_Suppliers(
+Surr_Supplier number NOT NULL,
+Id_Supplier number NOT NULL,
+Nome varchar2(255) NOT NULL,
+Endereco varchar2(255) NOT NULL
+);
+
+
+create table Fac_Compras(
+Surr_Tempo number NOT NULL,
+Surr_Employee number NOT NULL,
+Surr_Produto number NOT NULL,
+Surr_Supplier number NOT NULL,
+Custo_Unitario number(7,2) NOT NULL,
+Preco_Unitario number(7,2) NOT NULL,
+Quantidade number(10) NOT NULL,
+Custo_Total number(7,2) NOT NULL,
+Preco_Total number (10,2) NOT NULL
+);
+
+
+
+create table Fac_Promocoes(
+Surr_Produto number NOT NULL,
+Surr_Tempo number NOT NULL,
+Surr_Canal number NOT NULL,
+Nome varchar2(255) NOT NULL,
+Desconto number(5,3) NOT NULL,
+Tipo_Promocao varchar2(255) NOT NULL,
+Data_Inicio date NOT NULL,
+Data_Fim date NOT NULL,
+Quantidade_Total number(10) NOT NULL,
+Valor_Total number(10) NOT NULL
+);
+
+ALTER TABLE Dim_Tempo
+ADD PRIMARY KEY (Surr_Tempo);
+
+ALTER TABLE Dim_Promocoes
+ADD PRIMARY KEY (Surr_Promocao);
+
+ALTER TABLE Dim_Canais
+ADD PRIMARY KEY (Surr_Canal);
+
+ALTER TABLE Dim_Produtos
+ADD PRIMARY KEY (Surr_Produto);
+
+ALTER TABLE Dim_Clientes
+ADD PRIMARY KEY (Surr_Cliente);
+
+ALTER TABLE Dim_Employees
+ADD PRIMARY KEY (Surr_Employee);
+
+ALTER TABLE Dim_Suppliers
+ADD PRIMARY KEY (Surr_Supplier);
+
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Tempo 
+FOREIGN KEY (Surr_Tempo)
+REFERENCES Dim_Tempo(Surr_Tempo);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Promocoes
+FOREIGN KEY (Surr_Promocao)
+REFERENCES Dim_Promocoes(Surr_Promocao);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Canais 
+FOREIGN KEY (Surr_Canal)
+REFERENCES Dim_Canais(Surr_Canal);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Clientes 
+FOREIGN KEY (Surr_Cliente)
+REFERENCES Dim_Clientes(Surr_Cliente);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Produtos 
+FOREIGN KEY (Surr_Produto)
+REFERENCES Dim_Produtos(Surr_Produto);
+
+
+ALTER TABLE Fac_Vendas
+ADD PRIMARY KEY (Surr_Tempo,Surr_Canal,Surr_Promocao,Surr_Produto,Surr_Cliente);
+
+ALTER TABLE Fac_Compras
+ADD CONSTRAINT FK_Compras_Tempo
+FOREIGN KEY (Surr_Tempo)
+REFERENCES Dim_Tempo(Surr_Tempo);
+
+ALTER TABLE Fac_Compras
+ADD CONSTRAINT FK_Compras_Employee
+FOREIGN KEY (Surr_Employee)
+REFERENCES Dim_Employees(Surr_Employee);
+
+ALTER TABLE Fac_Compras
+ADD CONSTRAINT FK_Compras_Produto
+FOREIGN KEY (Surr_Produto)
+REFERENCES Dim_Produtos(Surr_Produto);
+
+ALTER TABLE Fac_Compras
+ADD CONSTRAINT FK_Compras_Supplier
+FOREIGN KEY (Surr_Supplier)
+REFERENCES Dim_Suppliers(Surr_Supplier);
+
+ALTER TABLE Fac_Compras
+ADD PRIMARY KEY (Surr_Tempo,Surr_Employee,Surr_Produto,Surr_Supplier);
+
+ALTER TABLE Fac_Promocoes
+ADD CONSTRAINT FK_Promocoes_Tempo
+FOREIGN KEY (Surr_Tempo)
+REFERENCES Dim_Tempo(Surr_Tempo);
+
+ALTER TABLE Fac_Promocoes
+ADD CONSTRAINT FK_Promocoes_Produto
+FOREIGN KEY (Surr_Produto)
+REFERENCES Dim_Produtos(Surr_Produto);
+
+ALTER TABLE Fac_Promocoes
+ADD CONSTRAINT FK_Promocoes_Canal
+FOREIGN KEY (Surr_Canal)
+REFERENCES Dim_Canais(Surr_Canal);
+
+ALTER TABLE Fac_Promocoes
+ADD PRIMARY KEY (Surr_Produto,Surr_Tempo,Surr_Canal);
+
+grant select,insert,update,delete on dim_canais to BDII_1010985,BDII_1010832;
+grant select,insert,update,delete on dim_clientes to BDII_1010985,BDII_1010832;
+grant select,insert,update,delete on dim_employees to BDII_1010985,BDII_1010832;
+grant select,insert,update,delete on dim_produtos to BDII_1010985,BDII_1010832;
+grant select,insert,update,delete on dim_promocoes to BDII_1010985,BDII_1010832;
+grant select,insert,update,delete on dim_suppliers to BDII_1010985,BDII_1010832;
+grant select,insert,update,delete on dim_tempo to BDII_1010985,BDII_1010832;
+grant select,insert,update,delete on fac_compras to BDII_1010985,BDII_1010832;
+grant select,insert,update,delete on fac_promocoes to BDII_1010985,BDII_1010832;
+grant select,insert,update,delete on fac_vendas to BDII_1010985,BDII_1010832;
+
+create or replace TRIGGER trigger_surr_canais
+before insert on dim_canais
+for each row
+begin
+  select pk_canais.nextval into :new.surr_canal from dual;
+end
+
+create or replace TRIGGER trigger_surr_tempo
+before insert on dim_tempo
+for each row
+begin
+  select pk_tempo.nextval into :new.surr_tempo from dual;
+end
+
+create or replace TRIGGER trigger_surr_employees
+before insert on dim_employees
+for each row
+begin
+  select pk_employees.nextval into :new.surr_employee from dual;
+end
+
+create or replace TRIGGER trigger_surr_promocoes
+before insert on dim_promocoes
+for each row
+begin
+  select pk_promocoes.nextval into :new.surr_promocao from dual;
+end
+
+create or replace TRIGGER trigger_surr_suppliers
+before insert on dim_suppliers
+for each row
+begin
+  select pk_suppliers.nextval into :new.surr_supplier from dual;
+end
+
+create or replace TRIGGER trigger_surr_produtos
+before insert on dim_produtos
+for each row
+begin
+  select pk_produtos.nextval into :new.surr_produto from dual;
+end
+
+create database link otlp_link_query
+connect to oltp_query identified by oltp_query
+using 'oltp';
