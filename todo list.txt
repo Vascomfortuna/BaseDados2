@@ -1,7 +1,8 @@
 dimenções:
 Tempo (feito, falta mini-dimenção, falta carregar apenas os novos)
-Canais(feito, falta carregar os ainda não inseridos)
-Promoções
+Canais(feito)
+Promoções(feito)
+Clientes
 Produtos
 Employees
 Suppliers
