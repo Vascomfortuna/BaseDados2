@@ -1,0 +1,94 @@
+drop table fac_vendas;
+drop table Dim_clientes;
+drop table mini_dim_clientes;
+
+create table Dim_Clientes(
+Surr_Cliente number NOT NULL,
+Id_Cliente number NOT NULL,
+Data_Nascimento date NOT NULL,
+Limite_Credito number(20) NOT NULL,
+Custo_Total number NOT NULL,
+fk_mini_cliente number not null
+);
+
+create table mini_dim_clientes(
+Surr_mini_cliente number not null,
+Idade_Classe varchar2(2) not null,
+Genero varchar2(255) NOT NULL,
+Estado_Civil varchar2(255) NOT NULL,
+Salario_Classe varchar2(2) NOT NULL,
+Cidade varchar2(255) NOT NULL,
+Provincia varchar2(255) NOT NULL,
+Pais varchar2(255) NOT NULL,
+Sub_Regiao varchar2(255) NOT NULL,
+Regiao varchar2(255) NOT NULL
+);
+
+create table Fac_Vendas (
+Surr_Tempo number NOT NULL,
+Surr_Canal number NOT NULL,
+Surr_Cliente number NOT NULL,
+Surr_Promocao number NOT NULL,
+Surr_Produto number NOT NULL,
+Surr_mini_cliente number not null,
+Unid_Vendidas number(4) NOT NULL,
+Custo_Compra number(6,2) NOT NULL,
+Valor_Venda number(7) NOT NULL
+);
+
+alter table mini_dim_clientes
+add primary key (surr_mini_cliente);
+
+alter table dim_clientes
+add primary key (surr_cliente);
+
+ALTER TABLE Dim_clientes
+ADD CONSTRAINT FK_Mini_Cliente
+FOREIGN KEY (Surr_Cliente)
+REFERENCES mini_dim_clientes(Surr_mini_cliente);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Tempo 
+FOREIGN KEY (Surr_Tempo)
+REFERENCES Dim_Tempo(Surr_Tempo);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Promocoes
+FOREIGN KEY (Surr_Promocao)
+REFERENCES Dim_Promocoes(Surr_Promocao);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Canais 
+FOREIGN KEY (Surr_Canal)
+REFERENCES Dim_Canais(Surr_Canal);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Clientes 
+FOREIGN KEY (Surr_Cliente)
+REFERENCES Dim_Clientes(Surr_Cliente);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Mini_Clientes 
+FOREIGN KEY (Surr_mini_Cliente)
+REFERENCES mini_Dim_Clientes(Surr_mini_Cliente);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Produtos 
+FOREIGN KEY (Surr_Produto)
+REFERENCES Dim_Produtos(Surr_Produto);
+
+
+ALTER TABLE Fac_Vendas
+ADD PRIMARY KEY (Surr_Tempo,Surr_Canal,Surr_Promocao,Surr_Produto,Surr_Cliente,Surr_mini_cliente);
+
+create table classe_idade (
+classe varchar2(2) not null,
+minimo number not null,
+maximo number not null
+);
+
+create table classe_salario (
+classe varchar2(2) not null,
+minimo number not null,
+maximo number not null
+);
