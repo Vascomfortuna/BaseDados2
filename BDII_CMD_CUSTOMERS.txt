@@ -1,0 +1,175 @@
+CREATE OR REPLACE PROCEDURE load_clientes
+IS
+  CURSOR cursor_mini
+  IS
+    SELECT cust.cust_id,
+      cust.cust_first_name,
+      cust.cust_last_name,
+      cust.cust_gender,
+      cust.cust_year_of_birth,
+      cust.cust_marital_status,
+      cust.cust_street_address,
+      cust.cust_main_phone_number,
+      cust.cust_income_level,
+      cust.cust_credit_limit,
+      cust.cust_total,
+      cust.cust_month_of_birth,
+      city.city,
+      state.state_province,
+      country.country_name,
+      sub.country_subregion,
+      reg.country_region
+    FROM oltp2015.customers@otlp_link_query cust
+    INNER JOIN oltp2015.cities@otlp_link_query city
+    ON cust.cust_city = city.city_id
+    INNER JOIN oltp2015.state_provinces@otlp_link_query state
+    ON city.state_province = state.state_province_id
+    INNER JOIN oltp2015.countries@otlp_link_query country
+    ON state.state_province_id = country.country_id
+    INNER JOIN oltp2015.country_subregions@otlp_link_query sub
+    ON country.country_subregion = sub.country_subregion_id
+    INNER JOIN oltp2015.country_regions@otlp_link_query reg
+    ON sub.country_region = reg.country_region_id;
+  varid oltp2015.customers.cust_id@otlp_link_query%TYPE;
+  varfirst oltp2015.customers.cust_first_name@otlp_link_query%TYPE;
+  varlast oltp2015.customers.cust_last_name@otlp_link_query%TYPE;
+  vargender oltp2015.customers.cust_gender@otlp_link_query%TYPE;
+  varyear oltp2015.customers.cust_year_of_birth@otlp_link_query%TYPE;
+  varmarital oltp2015.customers.cust_marital_status@otlp_link_query%TYPE;
+  varstreet oltp2015.customers.cust_street_address@otlp_link_query%TYPE;
+  varphone oltp2015.customers.cust_main_phone_number@otlp_link_query%TYPE;
+  varincome oltp2015.customers.cust_income_level@otlp_link_query%TYPE;
+  varcredit oltp2015.customers.cust_credit_limit@otlp_link_query%TYPE;
+  vartotal oltp2015.customers.cust_total@otlp_link_query%TYPE;
+  varmonth oltp2015.customers.cust_month_of_birth@otlp_link_query%TYPE;
+  varcity oltp2015.cities.city@otlp_link_query%TYPE;
+  varstate oltp2015.state_provinces.state_province@otlp_link_query%TYPE;
+  varcountry oltp2015.countries.country_name@otlp_link_query%TYPE;
+  varsub oltp2015.country_subregions.country_subregion@otlp_link_query%TYPE;
+  varreg oltp2015.country_regions.country_region@otlp_link_query%TYPE;
+  varidade VARCHAR2(50);
+  minisurr NUMBER;
+  datan    VARCHAR2(50);
+  nome     VARCHAR2(255);
+BEGIN
+  OPEN cursor_mini;
+  LOOP
+    FETCH cursor_mini
+    INTO varid,
+      varfirst,
+      varlast,
+      vargender,
+      varyear,
+      varmarital,
+      varstreet,
+      varphone,
+      varincome,
+      varcredit,
+      vartotal,
+      varmonth,
+      varcity,
+      varstate,
+      varcountry,
+      varsub,
+      varreg;
+    EXIT
+  WHEN cursor_mini%NOTFOUND;
+    varidade      :=cal_idade_classe(varyear,varmonth);
+    IF varmarital IS NULL THEN
+      varmarital  :='N';
+    END IF;
+    SELECT COUNT(surr_mini_cliente)
+    INTO minisurr
+    FROM mini_dim_clientes
+    WHERE idade_classe=varidade
+    AND genero        = vargender
+    AND estado_civil  =varmarital
+    AND salario_classe=varincome
+    AND cidade        =varcity
+    AND provincia     =varstate
+    AND pais          =varcountry
+    AND sub_regiao    =varsub
+    AND regiao        = varreg;
+    IF minisurr       <1 THEN
+      INSERT
+      INTO mini_dim_clientes
+        (
+          idade_classe,
+          genero,
+          estado_civil,
+          salario_classe,
+          cidade,
+          provincia,
+          pais,
+          sub_regiao,
+          regiao
+        )
+        VALUES
+        (
+          varidade,
+          vargender,
+          varmarital,
+          varincome,
+          varcity,
+          varstate,
+          varcountry,
+          varsub,
+          varreg
+        );
+        
+      SELECT MAX(surr_mini_cliente) INTO minisurr FROM mini_dim_clientes;
+    ELSE
+      SELECT surr_mini_cliente
+      INTO minisurr
+      FROM mini_dim_clientes
+      WHERE idade_classe=varidade
+      AND genero        = vargender
+      AND estado_civil  =varmarital
+      AND salario_classe=varincome
+      AND cidade        =varcity
+      AND provincia     =varstate
+      AND pais          =varcountry
+      AND sub_regiao    =varsub
+      AND regiao        = varreg;
+    END IF;
+    datan   := varyear || '/' || varmonth;
+    nome    := varfirst || ' ' || varlast;
+    vartotal:=to_number(REPLACE(TO_CHAR(vartotal),'.',','));
+    INSERT
+    INTO dim_clientes
+      (
+        id_cliente,
+        data_nascimento,
+        limite_credito,
+        custo_total,
+        fk_mini_cliente,
+        nome
+      )
+      VALUES
+      (
+        varid,
+        datan,
+        varcredit,
+        vartotal,
+        minisurr,
+        nome
+      );
+      
+  END LOOP;
+  COMMIT;
+  CLOSE cursor_mini;
+END;
+
+
+create or replace function cal_idade_classe(year number,month number) return varchar2 as
+idade number;
+classe varchar2(255);
+idade_data date;
+begin
+    idade_data:= (last_day( to_date( to_char(year) || '-' || to_char(month),'yyyy-mm')));
+    --idade_data:= to_date(to_number(to_char(sysdate,'j'))-to_number(to_char(idade_data,'j')),'j');
+    idade:= trunc(months_between(sysdate,idade_data)/12,0);
+    dbms_output.put_line(idade);
+    select classe || ' : ' || minimo || ' - ' || maximo into classe from classe_idade where minimo<=idade and idade<=maximo;
+    return classe;
+end;

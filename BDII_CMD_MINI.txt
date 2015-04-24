@@ -44,7 +44,7 @@ add primary key (surr_cliente);
 
 ALTER TABLE Dim_clientes
 ADD CONSTRAINT FK_Mini_Cliente
-FOREIGN KEY (Surr_Cliente)
+FOREIGN KEY (fk_mini_cliente)
 REFERENCES mini_dim_clientes(Surr_mini_cliente);
 
 ALTER TABLE Fac_Vendas
