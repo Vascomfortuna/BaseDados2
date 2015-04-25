@@ -1,0 +1,19 @@
+select distinct (emp.employee_id)
+      from BDII_1010832.employees emp
+      left join BDII_1010832.employees emp2
+      on emp.employee_id = emp2.manager_id
+      where emp.employee_id is not null
+      ;
+      
+select emp.employee_id, 
+      emp.commission_pct, 
+      emp.first_name || ' ' || emp.last_name, 
+      emp.hire_date,
+      emp.job_id,
+      emp2.first_name || ' ' || emp2.last_name, 
+      get_classe_salario(emp.salary) 
+      from BDII_1010832.employees emp
+      right join BDII_1010832.employees emp2
+      on emp.employee_id = emp2.manager_id
+      where emp.employee_id is null
+      ; 
