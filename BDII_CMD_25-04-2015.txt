@@ -1,0 +1,89 @@
+grant select,insert,delete,update on classe_idade to bdii_1010832,bdii_1010985;
+grant select,insert,delete,update on mini_dim_clientes to bdii_1010832,bdii_1010985;
+grant select,insert,delete,update on dim_clientes to bdii_1010832,bdii_1010985;
+
+
+Alter table fac_vendas
+drop constraint fk_vendas_mini_clientes ;
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Mini_clientes
+FOREIGN KEY (Surr_Mini_Cliente)
+REFERENCES Mini_dim_clientes(Surr_mini_cliente);
+
+alter table fac_vendas
+drop constraint SYS_C00211733;
+ALTER TABLE Fac_Vendas
+ADD PRIMARY KEY (Surr_Tempo,Surr_Canal,Surr_Promocao,Surr_Produto,Surr_Cliente,Surr_mini_cliente);
+
+
+Alter table fac_vendas
+drop constraint fk_vendas_produtos ;
+Alter table fac_promocoes
+drop constraint fk_promocoes_produto ;
+Alter table fac_compras
+drop constraint fk_compras_produto ;
+
+
+drop table Dim_Produtos;
+grant select,insert,delete,update on classe_idade to bdii_1010832,bdii_1010985;
+grant select,insert,delete,update on mini_dim_clientes to bdii_1010832,bdii_1010985;
+grant select,insert,delete,update on dim_clientes to bdii_1010832,bdii_1010985;
+
+
+Alter table fac_vendas
+drop constraint fk_vendas_mini_clientes ;
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Mini_clientes
+FOREIGN KEY (Surr_Mini_Cliente)
+REFERENCES Mini_dim_clientes(Surr_mini_cliente);
+
+alter table fac_vendas
+drop constraint SYS_C00211733;
+ALTER TABLE Fac_Vendas
+ADD PRIMARY KEY (Surr_Tempo,Surr_Canal,Surr_Promocao,Surr_Produto,Surr_Cliente,Surr_mini_cliente);
+
+
+Alter table fac_vendas
+drop constraint fk_vendas_produtos ;
+Alter table fac_promocoes
+drop constraint fk_promocoes_produto ;
+Alter table fac_compras
+drop constraint fk_compras_produto ;
+
+
+drop table Dim_Produtos;
+create table Dim_Produtos (
+Surr_Produto number NOT NULL,
+Id_Produto number NOT NULL,
+Categoria varchar2(255) NOT NULL,
+Sub_Categoria varchar2(255) NOT NULL,
+Classe_Peso number NULL,
+Unidade_Medida varchar2(255) NULL,
+Tamanho_Pacote varchar2(255) NULL,
+Estado varchar2(255) not null,
+Lista_Preco number NOT NULL,
+Min_Preco number NOT NULL,
+Custo_prod number null,
+Descricao varchar2(255)  NULL
+);
+
+ALTER TABLE Dim_Produtos
+ADD PRIMARY KEY (Surr_Produto);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Produtos 
+FOREIGN KEY (Surr_Produto)
+REFERENCES Dim_Produtos(Surr_Produto);
+
+
+ALTER TABLE Fac_Promocoes
+ADD CONSTRAINT FK_Promocoes_Produto
+FOREIGN KEY (Surr_Produto)
+REFERENCES Dim_Produtos(Surr_Produto);
+
+ALTER TABLE Fac_Compras
+ADD CONSTRAINT FK_Compras_Produto
+FOREIGN KEY (Surr_Produto)
+REFERENCES Dim_Produtos(Surr_Produto);
+
+grant select,insert,delete,update on dim_produtos to bdii_1010832,bdii_1010985;

@@ -1,0 +1,118 @@
+drop table fac_vendas;
+create table Fac_Vendas (
+Surr_Tempo number NOT NULL,
+Surr_Canal number NOT NULL,
+Surr_Cliente number NOT NULL,
+Surr_Promocao number NOT NULL,
+Surr_Produto number NOT NULL,
+Surr_mini_cliente number NOT NULL,
+Surr_empregado number NOT NULL,
+Unid_Vendidas number NOT NULL,
+Custo_Compra number NOT NULL,
+Valor_Venda number NOT NULL
+);
+
+drop table fac_compras;
+create table Fac_Compras(
+Surr_Tempo number NOT NULL,
+Surr_Empregado number NOT NULL,
+Surr_Produto number NOT NULL,
+Surr_Fornecedor number NOT NULL,
+Custo_Unitario number(7,2) NOT NULL,
+Preco_Unitario number(7,2) NOT NULL,
+Quantidade number(10) NOT NULL,
+Custo_Total number(7,2) NOT NULL,
+Preco_Total number (10,2) NOT NULL
+);
+
+
+
+drop table dim_empregados;
+create table Dim_Empregados (
+Surr_Empregado number NOT NULL,
+Id_Empregado number NOT NULL,
+Comissao number NULL,
+Nome varchar2(255) NULL,
+Data_contrato date  null,
+Trabalho varchar2(255)  NULL,
+Chefe varchar2(255)  NULL,
+Salario_Classe varchar2(255)  NULL
+);
+
+alter table dim_empregados
+add primary key (surr_empregado);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Tempo 
+FOREIGN KEY (Surr_Tempo)
+REFERENCES Dim_Tempo(Surr_Tempo);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Promocoes
+FOREIGN KEY (Surr_Promocao)
+REFERENCES Dim_Promocoes(Surr_Promocao);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Canais 
+FOREIGN KEY (Surr_Canal)
+REFERENCES Dim_Canais(Surr_Canal);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Clientes 
+FOREIGN KEY (Surr_Cliente)
+REFERENCES Dim_Clientes(Surr_Cliente);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Produtos 
+FOREIGN KEY (Surr_Produto)
+REFERENCES Dim_Produtos(Surr_Produto);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Empregados
+FOREIGN KEY (Surr_Empregado)
+REFERENCES Dim_empregados(Surr_empregado);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_mini_clientes 
+FOREIGN KEY (Surr_mini_cliente)
+REFERENCES mini_dim_clientes(surr_mini_cliente);
+
+ALTER TABLE Fac_Vendas
+ADD PRIMARY KEY (Surr_Tempo,Surr_Canal,Surr_Promocao,Surr_Produto,Surr_Cliente,Surr_mini_cliente,Surr_empregado);
+
+ALTER TABLE Fac_Compras
+ADD CONSTRAINT FK_Compras_Tempo
+FOREIGN KEY (Surr_Tempo)
+REFERENCES Dim_Tempo(Surr_Tempo);
+
+ALTER TABLE Fac_Compras
+ADD CONSTRAINT FK_Compras_empregados
+FOREIGN KEY (Surr_Empregado)
+REFERENCES Dim_Empregados(Surr_Empregado);
+
+ALTER TABLE Fac_Compras
+ADD CONSTRAINT FK_Compras_Produtos
+FOREIGN KEY (Surr_Produto)
+REFERENCES Dim_Produtos(Surr_Produto);
+
+ALTER TABLE Fac_Compras
+ADD CONSTRAINT FK_Compras_Fornecedores
+FOREIGN KEY (Surr_fornecedor)
+REFERENCES Dim_fornecedores(Surr_fornecedor);
+
+ALTER TABLE Fac_Compras
+ADD PRIMARY KEY (Surr_Tempo,Surr_Empregado,Surr_Produto,Surr_fornecedor);
+
+grant select,insert,delete,update on fac_vendas to bdii_1010832,bdii_1010985;
+grant select,insert,delete,update on fac_compras to bdii_1010832,bdii_1010985;
+grant select,insert,delete,update on dim_empregados to bdii_1010832,bdii_1010985;
+grant select,insert,delete,update on classe_salario to bdii_1010832,bdii_1010985;
+
+create or replace TRIGGER pk_empregados
+before insert on dim_empregados
+for each row
+
+begin
+  select pk_employees.nextval into :new.surr_empregado from dual;
+end;
+/
