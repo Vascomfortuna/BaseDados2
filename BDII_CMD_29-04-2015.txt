@@ -1,0 +1,25 @@
+select * from oltp2015.sales@otlp_link_query where sale_id= 1313913 or sale_id= 1288177 or sale_id= 1286400 or sale_id= 780423;-- group by cust_id,prod_id,channel_id,promotion_id,sale_date,employee_id;
+
+select * from dim_tempo;
+
+--6288,124,14389,null,64,1099,630
+
+select * from dim_promocoes;
+
+SELECT prod_id,
+  channel_id,
+  promotion_id,
+  to_char(sale_date,'yy-mm-dd hh24'),
+  employee_id
+FROM oltp2015.sales@otlp_link_query
+ where TO_NUMBER(to_char(sale_date,'hh24'))>12
+GROUP BY cust_id,
+  prod_id,
+  channel_id,
+  promotion_id,
+  to_char(sale_date,'yy-mm-dd hh24'),
+  employee_id;
+
+insert into dim_empregados values (0,0,0,'Desconhecido',null,'Desconhecido',null,'Desconhecido');
+insert into dim_promocoes values (0,0,'Sem Promoção',0,'Sem Tipo');
+commit;

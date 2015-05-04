@@ -1,0 +1,55 @@
+drop table fac_vendas;
+create table Fac_Vendas (
+Surr_Tempo number NOT NULL,
+Surr_Canal number NOT NULL,
+Surr_Cliente number NOT NULL,
+Surr_Promocao number NOT NULL,
+Surr_Produto number NOT NULL,
+Surr_mini_cliente number NOT NULL,
+Surr_empregado number NOT NULL,
+Unid_Vendidas number NOT NULL,
+Custo_Compra number NOT NULL,
+Valor_Venda number NOT NULL,
+Lucro number not null
+);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Tempo 
+FOREIGN KEY (Surr_Tempo)
+REFERENCES Dim_Tempo(Surr_Tempo);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Promocoes
+FOREIGN KEY (Surr_Promocao)
+REFERENCES Dim_Promocoes(Surr_Promocao);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Canais 
+FOREIGN KEY (Surr_Canal)
+REFERENCES Dim_Canais(Surr_Canal);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Clientes 
+FOREIGN KEY (Surr_Cliente)
+REFERENCES Dim_Clientes(Surr_Cliente);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Produtos 
+FOREIGN KEY (Surr_Produto)
+REFERENCES Dim_Produtos(Surr_Produto);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_Empregados
+FOREIGN KEY (Surr_Empregado)
+REFERENCES Dim_empregados(Surr_empregado);
+
+ALTER TABLE Fac_Vendas
+ADD CONSTRAINT FK_Vendas_mini_clientes 
+FOREIGN KEY (Surr_mini_cliente)
+REFERENCES mini_dim_clientes(surr_mini_cliente);
+
+
+ALTER TABLE Fac_Vendas
+ADD PRIMARY KEY (Surr_Tempo,Surr_Canal,Surr_Promocao,Surr_Produto,Surr_Cliente,Surr_mini_cliente,Surr_empregado);
+
+grant select,insert,delete,update on fac_vendas to bdii_1010832,bdii_1010985;
